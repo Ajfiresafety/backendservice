@@ -3,6 +3,7 @@ const app=express();
 const request=require('request');
 const cors=require('cors');
 var numtotext = require('number-to-words');
+const axios = require("axios");
 const dbUrl="https://ajfireservice-229a3-default-rtdb.firebaseio.com/";
 const header= {'Content-Type': 'application/x-www-form-urlencoded'};
 app.use(cors());
@@ -45,8 +46,19 @@ app.post('/addproduct',function(req,res){
 app.post('/getproducts',function(req,res){
     request({url:dbUrl+"allproducts.json"},(err,response)=>{
         if(!err){
+            var obj=[]
             const data=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-            res.json({status:true,data:data,message:"Products Fetched Successfully"})
+            const keys=[...new Map(Object.entries(JSON.parse(response.body))).keys()];
+            for(let i=0;i<data.length;i++){
+                obj.push({
+                    userid:keys[i],
+                    productdesc:data[i].productdesc,
+                    productimage:data[i].productimage,
+                    productname:data[i].productname,
+                    productprice:data[i].productprice
+                })
+            }
+            res.json({status:true,data:obj,message:"Products Fetched Successfully"})
         }else{
             res.json({status:false,message:"Products Fetch Error"})
         }
@@ -363,7 +375,56 @@ app.post('/getnogstbill',function(req,res){
 
 })
 
+app.post('/gststatus',function(req,res){
+    const gstno=req.body.gstno;
+    const options = {
+        method: 'GET',
+        url: 'https://gst-return-status.p.rapidapi.com/free/gstin/'+gstno,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RapidAPI-Key': '5d804c5658mshd863162740ffaccp190893jsn346407affba1',
+          'X-RapidAPI-Host': 'gst-return-status.p.rapidapi.com'
+        }
+      };
+      
+      axios.request(options).then(function (response) {
+          res.send(response.data)
+      }).catch(function (error) {
+          res.send(error)
+      });
+})
 
+app.post('/getproduct',function(req,res){
+    request({url:dbUrl+`allproducts/${req.body.userid}.json`},function(err,response){
+        if(!err){
+            const productdata=JSON.parse(response.body);
+            res.json({status:true,data:productdata,message:"Product Fetched Successfully !!"});
+        }else{
+            res.json({status:false,message:"Data was failed to fetch !!"});
+        }
+    })
+})
+
+app.post('/updateproduct',function(req,res){
+    request.put({url:dbUrl+`allproducts/${req.body.userid}.json`,form:JSON.stringify(req.body.data),headers:{'Content-Type': 'application/x-www-form-urlencoded'}},function(err,response,body){
+        if(!err){
+            res.json({status:true,message:"Product Data was updated Successfully !!"});
+        }else{
+            res.json({status:false,message:"Product Data was failed to update !!"});
+        }
+    })
+
+})
+
+app.post('/deleteproduct',function(req,res){
+    request.delete({url:dbUrl+`allproducts/${req.body.userid}.json`},function(err,response,body){
+        if(!err){
+            res.json({status:true,message:"Data was Deleted Successfully !"});
+        }else{
+            res.json({status:false,message:"Failed to delete !"});          
+        }
+    })
+})
 
 app.listen(4000,()=>{
     console.log("Port is Running")
