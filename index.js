@@ -313,6 +313,48 @@ app.post('/addnogst_bill',function(req,res){
     })
 })
 
+app.post('/addpurchase_report',function(req,res){
+    request.post({url:dbUrl+'purchasereport.json',form:JSON.stringify(req.body),headers:{'Content-Type': 'application/x-www-form-urlencoded'}},function(err,response,body){
+        if(!err){
+            res.json({status:true,message:"Purchase Report was Added Successfully"});
+        }else{
+            res.json({status:false,message:"Purchase Report was failed to add"});
+        }
+    })
+})
+
+app.get('/purchasereport_list',function(req,res){
+    request({url:dbUrl+'purchasereport.json'},function(err,response){
+        const purchasereport=[...new Map(Object.entries(JSON.parse(response.body))).values()];
+        if(!err){
+            res.json({status:true,data:purchasereport,message:"Purchase Report Fetched Successfully"});
+        }else{
+            res.json({status:false,message:"Purchase Report was Failed to Fetch"});
+        }
+    })
+})
+
+app.post('/addnogstpurchase_report',function(req,res){
+    request.post({url:dbUrl+'nogstpurchasereport.json',form:JSON.stringify(req.body),headers:{'Content-Type': 'application/x-www-form-urlencoded'}},function(err,response,body){
+        if(!err){
+            res.json({status:true,message:"Purchase Report was Added Successfully"});
+        }else{
+            res.json({status:false,message:"Purchase Report was failed to add"});
+        }
+    })
+})
+
+app.get('/nogstpurchase_reportlist',function(req,res){
+    request({url:dbUrl+'nogstpurchasereport.json'},function(err,response){
+        const nogstpurchasereport=[...new Map(Object.entries(JSON.parse(response.body))).values()];
+        if(!err){
+            res.json({status:true,data:nogstpurchasereport,message:"Purchase Report Fetched Successfully"});
+        }else{
+            res.json({status:false,message:"Purchase Report was Failed to Fetch"});
+        }
+    })
+})
+
 app.get('/printnogst_bill',function(req,res){
     request({url:dbUrl+'nogstbills.json'},function(err,response){
         const nogstbill=[...new Map(Object.entries(JSON.parse(response.body))).values()];
@@ -328,8 +370,12 @@ app.get('/printnogst_bill',function(req,res){
 app.get('/allgstinvoice',function(req,res){
     request({url:dbUrl+'allbills.json'},function(err,response){
         if(!err){
-            const allgstinvoice=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-            res.json({status:true,data:allgstinvoice,message:"All GST Invoice fetched Successfully !!"});
+            try{
+                const allgstinvoice=[...new Map(Object.entries(JSON.parse(response.body))).values()];
+                res.json({status:true,data:allgstinvoice,message:"All GST Invoice fetched Successfully !!"});
+            }catch(e){
+                res.json({status:false,message:"GST Invoice are empty!!"});
+            }
         }
     })
 })
@@ -353,8 +399,13 @@ app.post('/getgstbill',function(req,res){
 app.get('/allnogstinvoice',function(req,res){
     request({url:dbUrl+'nogstbills.json'},function(err,response){
         if(!err){
-            const allgstinvoice=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-            res.json({status:true,data:allgstinvoice,message:"All No GST Invoice fetched Successfully !!"});
+            try{
+                const allgstinvoice=[...new Map(Object.entries(JSON.parse(response.body))).values()];
+                res.json({status:true,data:allgstinvoice,message:"All No GST Invoice fetched Successfully !!"});
+            }catch(e){
+                res.json({status:false,message:"No GST Invoice is empty !!"});
+            }
+
         }
     })
 })
