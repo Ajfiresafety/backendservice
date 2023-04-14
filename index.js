@@ -2,6 +2,7 @@ const express=require('express');
 const app=express();
 const request=require('request');
 const cors=require('cors');
+const cheerio=require("cheerio");
 var numtotext = require('number-to-words');
 const axios = require("axios");
 const dbUrl="https://ajfireservice-229a3-default-rtdb.firebaseio.com/";
@@ -443,6 +444,33 @@ app.post('/gststatus',function(req,res){
       }).catch(function (error) {
           res.send(error)
       });
+})
+
+app.post("/gstdetails",async function(req,res){
+    var url="https://irisgst.com/gstin-filing-detail/?gstinno="+req.body.gstno;
+    var dataArr=[]
+        try{
+            const response=await axios.get(url);
+            const $=cheerio.load(response.data);
+            const gstdetail=$('.form-control');
+            gstdetail.each(function(){
+                dataArr.push($(this).val())
+            })
+
+            var dataObj={
+                tradeName:dataArr[0],
+                adr:dataArr[6]
+            }
+
+            if(dataArr.length>0){
+                res.json({status:true,data:dataObj,message:"GST Data Fetched Successfully"});
+            }else{
+                res.json({status:false,message:"No Data Found !!"});
+            }
+
+        }catch(e){
+            console.log(e);
+        }
 })
 
 app.post('/getproduct',function(req,res){
