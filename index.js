@@ -373,7 +373,7 @@ app.get('/allgstinvoice',function(req,res){
         if(!err){
             try{
                 const allgstinvoice=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-                res.json({status:true,data:allgstinvoice,message:"All GST Invoice fetched Successfully !!"});
+                res.json({status:true,data:allgstinvoice.reverse(),message:"All GST Invoice fetched Successfully !!"});
             }catch(e){
                 res.json({status:false,message:"GST Invoice are empty!!"});
             }
@@ -402,7 +402,7 @@ app.get('/allnogstinvoice',function(req,res){
         if(!err){
             try{
                 const allgstinvoice=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-                res.json({status:true,data:allgstinvoice,message:"All No GST Invoice fetched Successfully !!"});
+                res.json({status:true,data:allgstinvoice.reverse(),message:"All No GST Invoice fetched Successfully !!"});
             }catch(e){
                 res.json({status:false,message:"No GST Invoice is empty !!"});
             }
