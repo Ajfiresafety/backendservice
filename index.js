@@ -273,7 +273,10 @@ app.post('/savebill',function(req,res){
 app.get('/printbill',function(req,res){
     request({url:dbUrl+'allbills.json'},function(err,response){
         const invoicebill=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-        var ruppeesinwords=numtotext.toWords(invoicebill[invoicebill.length-1].billtable.overalltotal);
+        var ruppeesinwords=''
+        try{
+            ruppeesinwords=numtotext.toWords(invoicebill[invoicebill.length-1].billtable.overalltotal);
+        }catch(e){ }
         if(!err){
             res.json({status:true,data:invoicebill[invoicebill.length-1],Amountinwords:ruppeesinwords,message:"Bill Fetched Successfully"});
         }else{
@@ -359,7 +362,10 @@ app.get('/nogstpurchase_reportlist',function(req,res){
 app.get('/printnogst_bill',function(req,res){
     request({url:dbUrl+'nogstbills.json'},function(err,response){
         const nogstbill=[...new Map(Object.entries(JSON.parse(response.body))).values()];
-        var ruppeesinwords=numtotext.toWords(nogstbill[nogstbill.length-1].billtable.overalltotal);
+        var ruppeesinwords='';
+        try{
+            ruppeesinwords=numtotext.toWords(nogstbill[nogstbill.length-1].billtable.overalltotal);
+        }catch(e){}
         if(!err){
             res.json({status:true,data:nogstbill[nogstbill.length-1],Amountinwords:ruppeesinwords,message:"Bill Fetched Successfully"});
         }else{
@@ -389,7 +395,10 @@ app.post('/getgstbill',function(req,res){
             
             const invoiceno=req.body.invoice_num;
             var fnlres=[]=getgstbill.filter((el)=>el.invoice_no==invoiceno);
-            var ruppeesinwords=numtotext.toWords(fnlres[0].billtable.overalltotal);
+            var ruppeesinwords='';
+            try{
+                ruppeesinwords=numtotext.toWords(fnlres[0].billtable.overalltotal);
+            }catch(e){}
             res.json({status:true,data:fnlres[0],Amountinwords:ruppeesinwords,message:"Bill Fetched Successfully"});
         }
 
@@ -419,7 +428,10 @@ app.post('/getnogstbill',function(req,res){
             
             const invoiceno=req.body.invoice_num;
             var fnlres=[]=getgstbill.filter((el)=>el.invoice_no==invoiceno);
-            var ruppeesinwords=numtotext.toWords(fnlres[0].billtable.overalltotal);
+            var ruppeesinwords='';
+            try{
+                ruppeesinwords=numtotext.toWords(fnlres[0].billtable.overalltotal);
+            }catch(e){}
             res.json({status:true,data:fnlres[0],Amountinwords:ruppeesinwords,message:"Bill Fetched Successfully"});
         }
 
